@@ -11,7 +11,7 @@
     <arg name="headless" value="$(arg headless)" />
     <arg name="robot_model" value="$(find dragon)/robots/$(arg type)/$(arg onboards_model).urdf.xacro" />
     <arg name="robot_ns" value="$(arg robot_ns)" />
-    <arg name="rviz_config" value="$(find dragon)/config/rviz_config" />
+    <arg name="rviz_config" value="$(find differential_kinematics)/config/hri/handover.rviz" />
     <arg name="rviz_init_pose" value="$(find dragon)/config/$(arg type)/RvizInit.yaml" />
     <arg name="need_joint_state" value="false"/>
   </include>
@@ -21,6 +21,18 @@
     <param name = "tf_prefix" value = "$(arg robot_ns)" />
     <rosparam file="$(find dragon)/config/$(arg type)/RvizInit.yaml" command="load" />
     <rosparam file="$(find differential_kinematics)/config/dragon/$(arg type)/EndEffectorIK.yaml" command="load" />
+  </node>
+
+  <!-- Launch interactive marker node -->
+  <node pkg="differential_kinematics" type="interactive_marker.py" name="interactive_marker" output="screen">
+      <param name="frame_id" value="world" />
+  </node>
+
+  <!-- Launch pose transformer node -->
+  <node pkg="differential_kinematics" type="pose_transformer.py" name="pose_transformer" output="screen">
+      <param name="handover_dis_x" value="0.2" />
+      <param name="handover_dis_z" value="0.2" />
+      <param name="handover_pitch" value="0.2" />
   </node>
 
 </launch>
