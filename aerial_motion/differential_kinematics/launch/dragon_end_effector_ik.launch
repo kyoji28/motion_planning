@@ -29,7 +29,7 @@
   </node>
 
   <!-- Launch pose transformer node -->
-  <node pkg="differential_kinematics" type="pose_transformer.py" name="pose_transformer" output="screen">
+  <node pkg="differential_kinematics" type="pose_transformer_copy.py" name="pose_transformer" output="screen">
       <param name="handover_dis_x" value="0.2" />
       <param name="handover_dis_z" value="0.2" />
       <param name="handover_pitch" value="0.2" />
