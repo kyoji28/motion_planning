@@ -35,13 +35,14 @@
   </node>
 
   <!-- Launch pose transformer node -->
-  <node pkg="differential_kinematics" type="pose_transformer_copy.py" name="pose_transformer" output="screen">
-      <param name="handover_dis_x" value="$(arg hx)" />
-      <param name="handover_dis_y" value="$(arg hy)" />
-      <param name="handover_dis_z" value="$(arg hz)" />
+  <node pkg="differential_kinematics" type="pose_transformer_ik.py" name="pose_transformer" output="screen">
+      <param name="handover_dis_x" value="$(arg x)" />
+      <param name="handover_dis_y" value="$(arg y)" />
+      <param name="handover_dis_z" value="$(arg z)" />
       <param name="handover_roll" value="$(arg roll)" />
+      <param name="handover_pitch" value="$(arg pitch)" /> 
       <param name="handover_yaw" value="$(arg yaw)" />
-      <param name="handover_pitch" value="$(arg pitch)" />
+     
   </node>
 
 </launch>
