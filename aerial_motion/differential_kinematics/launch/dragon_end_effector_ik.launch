@@ -5,6 +5,12 @@
   <arg name="headless" default="false" />
   <arg name="onboards_model"  default = "euclid_201709" />
   <arg name="robot_ns" value="dragon" />
+  <arg name="x" default="0.2" />
+  <arg name="y" default="0.0" />
+  <arg name="z" default="0.2" />
+  <arg name="roll" default="0.0" />
+  <arg name="pitch" default="0.2" />
+  <arg name="yaw" default="3.14" />
 
   ###########  Robot Model  ###########
   <include file="$(find aerial_robot_model)/launch/aerial_robot_model.launch" >
@@ -29,10 +35,19 @@
   </node>
 
   <!-- Launch pose transformer node -->
-  <node pkg="differential_kinematics" type="pose_transformer_copy.py" name="pose_transformer" output="screen">
-      <param name="handover_dis_x" value="0.2" />
-      <param name="handover_dis_z" value="0.2" />
-      <param name="handover_pitch" value="0.2" />
+  <node pkg="differential_kinematics" type="pose_transformer_ik.py" name="pose_transformer" output="screen">
+      <param name="x" value="$(arg x)" />
+      <param name="y" value="$(arg y)" />
+      <param name="z" value="$(arg z)" />
+      <param name="roll" value="$(arg roll)" />
+      <param name="pitch" value="$(arg pitch)" /> 
+      <param name="yaw" value="$(arg yaw)" />
+     
+  </node>
+
+  <node pkg="differential_kinematics" type="ef_offset_keyboard.py" name="ef_offset_keyboard" output="screen">
+    <!-- pose_transformer の名前空間 -->
+    <param name="target_ns" value="/pose_transformer" />
   </node>
 
 </launch>
