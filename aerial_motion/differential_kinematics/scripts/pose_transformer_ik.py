@@ -62,6 +62,18 @@ class PoseTransformer:
         self.handover_pitch = rospy.get_param('~pitch', self.handover_pitch)
         self.handover_yaw = rospy.get_param('~yaw', self.handover_yaw)
 
+        # ここで、ef_pose_in_handを更新する
+        self.ef_pose_in_hand.pose.position.x = self.handover_dis_x
+        self.ef_pose_in_hand.pose.position.y = self.handover_dis_y
+        self.ef_pose_in_hand.pose.position.z = self.handover_dis_z
+
+        q = quaternion_from_euler(self.handover_roll, self.handover_pitch, self.handover_yaw)
+        self.ef_pose_in_hand.pose.orientation.x = q[0]
+        self.ef_pose_in_hand.pose.orientation.y = q[1]
+        self.ef_pose_in_hand.pose.orientation.z = q[2]
+        self.ef_pose_in_hand.pose.orientation.w = q[3]
+
+        # 手のTF更新
         self.world2hand_tf.header.stamp = rospy.Time.now()
         self.world2hand_tf.transform.translation.x = msg.pose.position.x
         self.world2hand_tf.transform.translation.y = msg.pose.position.y
