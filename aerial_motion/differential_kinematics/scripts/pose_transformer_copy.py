@@ -14,7 +14,10 @@ class PoseTransformer:
         rospy.loginfo("PoseTransgormer node started successfully")
 
         self.handover_dis_x = rospy.get_param('~handover_dis_x', 0.1)
+        self.handover_dis_y = rospy.get_param('~handover_dis_y', 0.0)
         self.handover_dis_z = rospy.get_param('~handover_dis_z', 0.1)
+        self.handover_roll = rospy.get_param('~handover_roll', 0.0)
+        self.handover_yaw = rospy.get_param('~handover_yaw', 0.0)
         self.handover_pitch = rospy.get_param('~handover_pitch', 0.1)
 
         self.hand_pose_sub = rospy.Subscriber('/desired_3D_pose', PoseStamped, self.hand_pose_cb)
@@ -32,9 +35,12 @@ class PoseTransformer:
         self.ef_pose_in_hand = PoseStamped()
         self.ef_pose_in_hand.header.frame_id = "hand_frame"
         self.ef_pose_in_hand.pose.position.x = self.handover_dis_x
-        self.ef_pose_in_hand.pose.position.y = 0.0
+        self.ef_pose_in_hand.pose.position.y = self.handover_dis_y
         self.ef_pose_in_hand.pose.position.z = self.handover_dis_z
+
+        #このクオータニオンで手に対するエンドエフェクタの姿勢を設定
         q = quaternion_from_euler(0.0, self.handover_pitch, np.pi)
+
         self.ef_pose_in_hand.pose.orientation.x = q[0]
         self.ef_pose_in_hand.pose.orientation.y = q[1]
         self.ef_pose_in_hand.pose.orientation.z = q[2]
