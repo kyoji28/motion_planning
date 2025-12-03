@@ -5,12 +5,12 @@
   <arg name="headless" default="false" />
   <arg name="onboards_model"  default = "euclid_201709" />
   <arg name="robot_ns" value="dragon" />
-  <arg name="hx" default="0.2" />
-  <arg name="hy" default="0.0" />
-  <arg name="hz" default="0.2" />
+  <arg name="x" default="0.2" />
+  <arg name="y" default="0.0" />
+  <arg name="z" default="0.2" />
   <arg name="roll" default="0.0" />
-  <arg name="pitch" default="0.0" />
-  <arg name="yaw" default="0.2" />
+  <arg name="pitch" default="0.2" />
+  <arg name="yaw" default="3.14" />
 
   ###########  Robot Model  ###########
   <include file="$(find aerial_robot_model)/launch/aerial_robot_model.launch" >
@@ -36,12 +36,12 @@
 
   <!-- Launch pose transformer node -->
   <node pkg="differential_kinematics" type="pose_transformer_ik.py" name="pose_transformer" output="screen">
-      <param name="handover_dis_x" value="$(arg x)" />
-      <param name="handover_dis_y" value="$(arg y)" />
-      <param name="handover_dis_z" value="$(arg z)" />
-      <param name="handover_roll" value="$(arg roll)" />
-      <param name="handover_pitch" value="$(arg pitch)" /> 
-      <param name="handover_yaw" value="$(arg yaw)" />
+      <param name="x" value="$(arg x)" />
+      <param name="y" value="$(arg y)" />
+      <param name="z" value="$(arg z)" />
+      <param name="roll" value="$(arg roll)" />
+      <param name="pitch" value="$(arg pitch)" /> 
+      <param name="yaw" value="$(arg yaw)" />
      
   </node>
 
