@@ -45,4 +45,9 @@
      
   </node>
 
+  <node pkg="differential_kinematics" type="ef_offset_keyboard.py" name="ef_offset_keyboard" output="screen">
+    <!-- pose_transformer の名前空間 -->
+    <param name="target_ns" value="/pose_transformer" />
+  </node>
+
 </launch>
