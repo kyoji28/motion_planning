@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
 import rospy
+from differential_kinematics.msg import TargetPose
 from geometry_msgs.msg import PoseStamped, TransformStamped
 import tf2_ros
 from tf.transformations import quaternion_from_euler, euler_from_quaternion
-from differential_kinematics.srv import TargetPose, TargetPoseRequest, TargetPoseResponse
 import tf2_geometry_msgs # required
 import numpy as np
 
@@ -47,11 +47,8 @@ class PoseTransformer:
         self.ef_pose_in_hand.pose.orientation.z = q[2]
         self.ef_pose_in_hand.pose.orientation.w = q[3]
 
-        # IKサービスとの接続準備
-        rospy.loginfo("Waiting for /dragon/end_effector_ik service...")
-        rospy.wait_for_service('/dragon/end_effector_ik')
-        self.ik_client = rospy.ServiceProxy('/dragon/end_effector_ik', TargetPose)
-        rospy.loginfo("Connected to /dragon/end_effector_ik service")
+        # IKのトピックとの接続準備
+        self.ik_pub = rospy.Publisher('/dragon/end_effector_ik', TargetPose, queue_size=1)
 
     def hand_pose_cb(self,msg):
         # 毎回最新のパラメータを反映する
@@ -90,7 +87,7 @@ class PoseTransformer:
             ef_pose_in_world = self.tf_buffer.transform(self.ef_pose_in_hand, "world",rospy.Duration(0.5)) #waiting for TF timeout of 0.5 seonds
             self.ef_pose_pub.publish(ef_pose_in_world)
 
-            # ====== ここからIKサービス呼び出し部分を追加 ======
+            # ====== ここからIK topic部分を追加 ======
             # ①位置をそのままコピー
             tx = ef_pose_in_world.pose.position.x
             ty = ef_pose_in_world.pose.position.y
@@ -101,26 +98,25 @@ class PoseTransformer:
             quat = [q.x, q.y, q.z, q.w]
             roll, pitch, yaw = euler_from_quaternion(quat)
 
-            # ③サービスリクエストを作成
-            req = TargetPoseRequest()
-            req.target_pos.x = tx
-            req.target_pos.y = ty
-            req.target_pos.z = tz
+            # ③メッセージを作成
+            msg = TargetPose()
+            msg.target_pos.x = tx
+            msg.target_pos.y = ty
+            msg.target_pos.z = tz
 
-            req.target_rot.x = roll
-            req.target_rot.y = pitch
-            req.target_rot.z = yaw
+            msg.target_rot.x = roll
+            msg.target_rot.y = pitch
+            msg.target_rot.z = yaw
 
-            req.orientation = True
-            req.full_body = True
-            req.collision_avoidance = False
-            req.tran_free_axis = ''
-            req.rot_free_axis = '' 
-            req.debug = False
+            msg.orientation = True
+            msg.full_body = True
+            msg.collision_avoidance = False
+            msg.tran_free_axis = ''
+            msg.rot_free_axis = '' 
+            msg.debug = False
 
-            # ④サービスを実行
-            res = self.ik_client(req)
-            rospy.loginfo("EndEffectorIK status: %s", res.status)
+            # ④メッセージのpublish
+            self.ik_pub.publish(msg)
 
 
         except Exception as e:
