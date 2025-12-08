@@ -12,7 +12,15 @@
 
   Use keyboard or jotstick to make robot takeoff
 
-#### End-effecot waypoint
+### End-effecot waypoint
+
+#### Option1: Use Interactive Marker in Rviz
+
+-- add message of interactive marker `/target_pose/update`
+-- use this interactive marker as usaually
+
+#### Option2: Terminal
+
 ```
 $ rostopic pub -1 /dragon/target_end_effector_pose/goal ik_base_nav/TargetPoseActionGoal "header:
   seq: 0

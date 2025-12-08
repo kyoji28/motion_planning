@@ -6,7 +6,30 @@
 
     <rosparam file="$(find ik_base_nav)/config/end_effector.yaml" command="load" />
     <param name="control_frequency" value="40.0" />
+  </node>
 
+
+  <!-- Launch interactive marker node -->
+  <node pkg="differential_kinematics" type="interactive_marker.py" name="interactive_marker" output="screen">
+      <param name="frame_id" value="world" />
+  </node>
+
+
+  <arg name="x" default="0.2" />
+  <arg name="y" default="0.0" />
+  <arg name="z" default="0.2" />
+  <arg name="roll" default="0.0" />
+  <arg name="pitch" default="0.2" />
+  <arg name="yaw" default="3.14" />
+
+  <!-- Launch pose transformer node -->
+  <node pkg="differential_kinematics" type="pose_transformer_ik_actionlib.py" name="pose_transformer" output="screen">
+      <param name="x" value="$(arg x)" />
+      <param name="y" value="$(arg y)" />
+      <param name="z" value="$(arg z)" />
+      <param name="roll" value="$(arg roll)" />
+      <param name="pitch" value="$(arg pitch)" />
+      <param name="yaw" value="$(arg yaw)" />
   </node>
 
 </launch>
