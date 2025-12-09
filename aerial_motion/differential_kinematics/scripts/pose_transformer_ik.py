@@ -87,18 +87,18 @@ class PoseTransformer:
             ef_pose_in_world = self.tf_buffer.transform(self.ef_pose_in_hand, "world",rospy.Duration(0.5)) #waiting for TF timeout of 0.5 seonds
             self.ef_pose_pub.publish(ef_pose_in_world)
 
-            # ====== ここからIK topic部分を追加 ======
-            # ①位置をそのままコピー
+            # # ====== ここからIK topic部分を追加 ======
+            # # ①位置をそのままコピー
             tx = ef_pose_in_world.pose.position.x
             ty = ef_pose_in_world.pose.position.y
             tz = ef_pose_in_world.pose.position.z
 
-            # ②姿勢：クオータニオン　→ roll,pitch,yaw へ変換
+            # # ②姿勢：クオータニオン　→ roll,pitch,yaw へ変換
             q = ef_pose_in_world.pose.orientation
             quat = [q.x, q.y, q.z, q.w]
             roll, pitch, yaw = euler_from_quaternion(quat)
 
-            # ③メッセージを作成
+            # # ③メッセージを作成
             msg = TargetPose()
             msg.target_pos.x = tx
             msg.target_pos.y = ty
@@ -115,7 +115,7 @@ class PoseTransformer:
             msg.rot_free_axis = '' 
             msg.debug = False
 
-            # ④メッセージのpublish
+            # # ④メッセージのpublish
             self.ik_pub.publish(msg)
 
 

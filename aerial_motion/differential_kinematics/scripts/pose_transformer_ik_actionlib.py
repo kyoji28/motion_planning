@@ -31,8 +31,20 @@ class PoseTransformer:
         self.world2hand_tf.header.frame_id = "world"
         self.world2hand_tf.child_frame_id = "hand_frame"
 
+        #　目標エンドエフェクタ用のTF broadcasterを追加
+        self.world2ee_tf_bc = tf2_ros.TransformBroadcaster()
+        self.world2ee_tf = TransformStamped()
+        self.world2ee_tf.header.frame_id = "world"
+        self.world2ee_tf.child_frame_id = "dragon/target_end_effector"
+
         self.tf_buffer = tf2_ros.Buffer()
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)
+
+        # 最後に計算した世界座標系での目標EF姿勢を保存する変数
+        self.latest_ef_pose_in_world = None
+
+        # 一定周期でTFを流すタイマー
+        self.tf_timer = rospy.Timer(rospy.Duration(0.02), self.publish_target_tf)
 
         self.ef_pose_in_hand = PoseStamped()
         self.ef_pose_in_hand.header.frame_id = "hand_frame"
@@ -81,12 +93,28 @@ class PoseTransformer:
 
         self.transform_pose()
 
+    def publish_target_tf(self, event):
+        if self.latest_ef_pose_in_world is None:
+            return 
+        pose = self.latest_ef_pose_in_world
+
+        self.world2ee_tf.header.stamp = rospy.Time.now()
+        self.world2ee_tf.transform.translation.x = self.latest_ef_pose_in_world.pose.position.x
+        self.world2ee_tf.transform.translation.y = self.latest_ef_pose_in_world.pose.position.y
+        self.world2ee_tf.transform.translation.z = self.latest_ef_pose_in_world.pose.position.z
+        self.world2ee_tf.transform.rotation = self.latest_ef_pose_in_world.pose.orientation
+        
+        self.world2ee_tf_bc.sendTransform(self.world2ee_tf)
+
     def transform_pose(self):
         self.ef_pose_in_hand.header.stamp =self.world2hand_tf.header.stamp #Use Teh same timestamp as the hand frame)
         
         try:
             ef_pose_in_world = self.tf_buffer.transform(self.ef_pose_in_hand, "world",rospy.Duration(0.5)) #waiting for TF timeout of 0.5 seonds
             self.ef_pose_pub.publish(ef_pose_in_world)
+
+            # ここで最新の目標EE姿勢を保存しておく
+            self.latest_ef_pose_in_world = ef_pose_in_world
 
             # ====== ここからIK topic部分を追加 ======
             # ①位置をそのままコピー

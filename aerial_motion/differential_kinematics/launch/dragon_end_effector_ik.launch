@@ -15,7 +15,13 @@
   ###########  Robot Model  ###########
   <include file="$(find aerial_robot_model)/launch/aerial_robot_model.launch" >
     <arg name="headless" value="$(arg headless)" />
-    <arg name="robot_model" value="$(find dragon)/robots/$(arg type)/$(arg onboards_model).urdf.xacro" />
+    <arg name="robo        self.world2ee_tf.header.stamp = rospy.Time.now()
+                    self.world2ee_tf.transform.translation.x = self.latest_ef_pose_in_world.pose.position.x
+                    self.world2ee_tf.transform.translation.y = self.latest_ef_pose_in_world.pose.position.y
+                    self.world2ee_tf.transform.translation.z = self.latest_ef_pose_in_world.pose.position.z
+                    self.world2ee_tf.transform.rotation = self.latest_ef_pose_in_world.pose.orientation
+                    self.world2ee_tf_bc.sendTransform(self.world2ee_tf)
+t_model" value="$(find dragon)/robots/$(arg type)/$(arg onboards_model).urdf.xacro" />
     <arg name="robot_ns" value="$(arg robot_ns)" />
     <arg name="rviz_config" value="$(find differential_kinematics)/config/hri/handover.rviz" />
     <arg name="rviz_init_pose" value="$(find dragon)/config/$(arg type)/RvizInit.yaml" />

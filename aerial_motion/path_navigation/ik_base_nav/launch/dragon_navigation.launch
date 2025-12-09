@@ -9,6 +9,8 @@
   </node>
 
 
+  <!-- <node pkg="rviz" type="rviz" name="rviz" args="-d $(find ik_base_nav)/config/ik_base_nav.rviz" /> -->
+
   <!-- Launch interactive marker node -->
   <node pkg="differential_kinematics" type="interactive_marker.py" name="interactive_marker" output="screen">
       <param name="frame_id" value="world" />
@@ -30,6 +32,11 @@
       <param name="roll" value="$(arg roll)" />
       <param name="pitch" value="$(arg pitch)" />
       <param name="yaw" value="$(arg yaw)" />
+  </node>
+
+  <node pkg="differential_kinematics" type="ef_offset_keyboard.py" name="ef_offset_keyboard" output="screen">
+    <!-- pose_transformer の名前空間 -->
+    <param name="target_ns" value="/pose_transformer" />
   </node>
 
 </launch>
