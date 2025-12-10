@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <launch>
 
+  <!-- 追加：インタラクティブマーカーを使うかどうか -->
+  <arg name="use_marker" default="True" />
+
+
   ###########  IK-based Navigation  ###########
   <node pkg="ik_base_nav" type="dragon_ik_base_navigation_node" name="dragon_ik_base_navigation_node" output="screen" ns="dragon" >
 
@@ -12,7 +16,7 @@
   <!-- <node pkg="rviz" type="rviz" name="rviz" args="-d $(find ik_base_nav)/config/ik_base_nav.rviz" /> -->
 
   <!-- Launch interactive marker node -->
-  <node pkg="differential_kinematics" type="interactive_marker.py" name="interactive_marker" output="screen">
+  <node pkg="differential_kinematics" type="interactive_marker.py" name="interactive_marker" output="screen" if="$(arg use_marker)">
       <param name="frame_id" value="world" />
   </node>
 
