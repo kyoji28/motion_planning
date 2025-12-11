@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import rospy
+import subprocess
+from geometry_msgs.msg import PoseStamped
 import sys
 import termios
 import tty
@@ -21,7 +23,67 @@ class EfOffsetKeyboard:
         # 増減ステップ
         self.step_pos = 0.01 # m 位置オフセット
         self.step_angle = 0.05 # rad 角度オフセット
-        
+
+        # 追加1:最新の手の目標姿勢を保持する変数
+        self.latest_hand_pose = None
+
+        #追加2:/hand/target_poseを購読
+        self.hand_sub = rospy.Subscriber('/hand/target_pose', PoseStamped, self.hand_pose_cb, queue_size=1)
+
+        #追加3:DRAGONに渡す最終目標/desired_3D_pose
+        self.goal_pub = rospy.Publisher('/desired_3D_pose', PoseStamped, queue_size=1)
+
+    def hand_pose_cb(self,msg):
+        """ /hand/target_poes を受け取ったときに、最新値として保存する """
+        self.latest_hand_pose = msg
+    
+    # ==========================
+    # DRAGON ポーズ指定メニュー
+    # ==========================
+    def call_transformation_demo(self, extra_args):
+        """
+        dragon/transformation_demo.py をサブプロセスとして起動するヘルパ
+        extra_args: ['_mode:=0'] や ['_reset:=1'] など
+        """
+
+        cmd = ['rosrun', 'dragon', 'transformation_demo.py'] + extra_args
+        rospy.loginfo("Run transformation_demo: %s", ''.join(cmd))
+        try:
+            #非同期で起動（メニューですぐ戻って来たいのでPopen)
+            subprocess.Popen(cmd)
+        except Exception as e:
+            rospy.logerr("Failed to run transformation_demo: %s", e)
+            print("transformation_demo の起動に失敗しました: {}".format(e))
+    
+    def dragon_pose_menu(self):
+        """
+        DRAGON のポーズを選ぶサブメニュー
+        """
+        print("\n=== DRAGON ポーズメニュー (transformation_demo) ===")
+        print("0 : default dragon pose (_mode:=0)")
+        print("1 : spiral pose         (_mode:=1)")
+        print("2 : m-like pose         (_mode:=2)")
+        print("3 : normal pose         (_reset:=1)")
+        print("4 : reverse normal pose (_reverse_reset:=1)")
+        print("=========================================\n")
+
+        choice = input("番号を入力してください：").strip()
+
+        if choice == '0':
+            self.call_transformation_demo(['_mode:=0'])
+        elif choice == '1':
+            self.call_transformation_demo(['_mode:=1'])
+        elif choice == '2':
+            self.call_transformation_demo(['_mode:=2'])
+        elif choice == '3':
+            self.call_transformation_demo(['_reset:=1'])
+        elif choice == '4':
+            self.call_transformation_demo(['_reverse_reset:=1'])
+        elif choice == 'b':
+            print("メインメニューに戻ります。")
+        else:
+            print("不明な入力です：{}".format(choice))
+
     # ---- ヘルパ ----
     def _full_name(self, name: str) -> str:
         """名前空間付きのパラメータ名を返す"""
@@ -197,12 +259,14 @@ class EfOffsetKeyboard:
 
         while not rospy.is_shutdown():
             print("\n --- メニュー ---")
+            print(" g : /hand/target_pose を /desired_3D_pose に送ってDRAGON を動かす")
             print(" a : x, y, z, roll, pitch, yaw　を一括入力")
             print(" x/y/z/r/p/u : 編集対象を変更")
             print(" w : 現在の編集対象を　+ 方向に増加")
             print(" s : 現在の編集対象を　- 方向に減少")
             print(" m : 現在のオフセット値を表示")
             print(" c : 連続操作モードへ")
+            print(" t : DRAGON ポーズ指定メニュー(transformation_demo)")
             print(" q : 終了")
             cmd = input("コマンドを入力してください：").strip()
             
@@ -218,6 +282,14 @@ class EfOffsetKeyboard:
                 self.show_current_offsets(short=False)
             elif cmd == 'c':
                 self.continuous_mode()
+            elif cmd == 't':
+                self.dragon_pose_menu()
+            elif cmd == 'g':
+                if self.latest_hand_pose is None:
+                    rospy.logwarn("まだ /hand/target_pose を受け取っていません。")
+                else:
+                    self.goal_pub.publish(self.latest_hand_pose)
+                    rospy.loginfo("現在の /hand/target_pose を /desired_3D_pose に送信しました。 DRAGON移動開始")
             elif cmd in ['x', 'y', 'z', 'r', 'p', 'u', 'w', 's']:
                 self.change_mode_or_increment(cmd)
             else:
