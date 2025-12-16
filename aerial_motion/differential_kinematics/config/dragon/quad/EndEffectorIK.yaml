@@ -1,5 +1,6 @@
 # inverse kinematics
-differential_kinematics_count: 200
+#default : 200
+differential_kinematics_count: 10000
 
 # cost
 differential_kinematics_cost:
