@@ -125,6 +125,10 @@ public:
                                tf::Quaternion& baselink_desired_att,
                                geometry_msgs::Pose& cog_pose);
 
+  static void convertBaselinkPose2RootPose(boost::shared_ptr<aerial_robot_model::transformable::RobotModel> robot_model_ptr,
+                                           const tf::Transform& baselink_tf,
+                                           const KDL::JntArray& joint_state,
+                                           tf::Transform& root_tf);
 
 
   static void convertBaselinkPose2RootPose(boost::shared_ptr<aerial_robot_model::transformable::RobotModel> robot_model_ptr,

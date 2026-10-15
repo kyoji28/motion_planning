@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<launch>
+
+  <node pkg="ik_base_nav"
+        type="dragon_ik_base_navigation_node"
+        name="dragon_ik_base_navigation_node"
+        output="screen"
+        ns="dragon">
+
+    <rosparam
+      file="$(find differential_kinematics)/config/dragon/quad/EndEffectorIK.yaml"
+      command="load"
+      ns="end_effector" />
+
+    <param name="control_frequency" value="40.0" />
+
+  </node>
+
+</launch>
