@@ -7,7 +7,10 @@
         output="screen"
         ns="dragon">
 
-    <rosparam file="$(find ik_base_nav)/config/end_effector.yaml" command="load" />
+    <rosparam
+      file="$(find differential_kinematics)/config/dragon/quad/EndEffectorIK.yaml"
+      command="load"
+      ns="end_effector" />
 
     <param name="control_frequency" value="40.0" />
 
