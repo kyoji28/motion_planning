@@ -3,7 +3,7 @@
   ###########  launch config  ###########
   <arg name="type" default="quad" />
   <arg name="headless" default="false" />
-  <arg name="onboards_model"  default = "euclid_201709" />
+  <arg name="onboards_model"  default = "v1_5_202601" />
   <arg name="robot_ns" value="dragon" />
   <arg name="x" default="0.2" />
   <arg name="y" default="0.0" />
@@ -15,23 +15,21 @@
   ###########  Robot Model  ###########
   <include file="$(find aerial_robot_model)/launch/aerial_robot_model.launch" >
     <arg name="headless" value="$(arg headless)" />
-    <arg name="robo        self.world2ee_tf.header.stamp = rospy.Time.now()
-                    self.world2ee_tf.transform.translation.x = self.latest_ef_pose_in_world.pose.position.x
-                    self.world2ee_tf.transform.translation.y = self.latest_ef_pose_in_world.pose.position.y
-                    self.world2ee_tf.transform.translation.z = self.latest_ef_pose_in_world.pose.position.z
-                    self.world2ee_tf.transform.rotation = self.latest_ef_pose_in_world.pose.orientation
-                    self.world2ee_tf_bc.sendTransform(self.world2ee_tf)
-t_model" value="$(find dragon)/robots/$(arg type)/$(arg onboards_model).urdf.xacro" />
+    <arg name="robot_model"
+         value="$(find dragon)/robots/$(arg type)/$(arg onboards_model).urdf.xacro" />
     <arg name="robot_ns" value="$(arg robot_ns)" />
-    <arg name="rviz_config" value="$(find differential_kinematics)/config/hri/handover.rviz" />
-    <arg name="rviz_init_pose" value="$(find dragon)/config/$(arg type)/RvizInit.yaml" />
+    <arg name="rviz_config"
+         value="$(find differential_kinematics)/config/hri/handover.rviz" />
+    <arg name="rviz_init_pose"
+         value="$(find dragon)/config/$(arg type)/$(arg onboards_model)/RvizInit.yaml" />
     <arg name="need_joint_state" value="false"/>
   </include>
 
   ###########  Differential Motion Planner  ###########
   <node pkg="differential_kinematics" type="se3_end_effector_ik_node" name="end_effector_ik_node"  output="screen"  ns="$(arg robot_ns)">
     <param name = "tf_prefix" value = "$(arg robot_ns)" />
-    <rosparam file="$(find dragon)/config/$(arg type)/RvizInit.yaml" command="load" />
+    <rosparam file="$(find dragon)/config/$(arg type)/$(arg onboards_model)/RvizInit.yaml"
+          command="load" />
     <rosparam file="$(find differential_kinematics)/config/dragon/$(arg type)/EndEffectorIK.yaml" command="load" />
   </node>
 
