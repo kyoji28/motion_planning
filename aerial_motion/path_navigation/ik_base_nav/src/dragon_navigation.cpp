@@ -184,7 +184,7 @@ bool IKBaseNavigator::generateTraj(const tf::Transform target_ee_pose, const boo
   MultilinkState::convertBaselinkPose2RootPose(robot_model_ptr_, baselink_pose_, joint_state_, root_pose);
 
   /* get the discrete path from IK */
-  if(!end_effector_ik_solver.inverseKinematics(target_ee_pose, robot_model_ptr_->kdlJointToMsg(joint_state_), root_pose, orientation_flag, true, tran_free_axis, rot_free_axis, false, false))
+  if(!end_effector_ik_solver.inverseKinematics(target_ee_pose, robot_model_ptr_->kdlJointToMsg(joint_state_), root_pose, orientation_flag, false, tran_free_axis, rot_free_axis, false, false))
     {
       ROS_ERROR("[DRAGON IK Nav] cannot solve IK ");
       return false;
